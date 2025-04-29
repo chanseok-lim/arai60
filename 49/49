@@ -1,0 +1,50 @@
+## Step1
+5分以内に書けなかった。
+各単語に対して、{a_i: n_i}, a_i = i番目のアルファベット、n_i = その単語がi番目のアルファベットを含む数というdictを作成して、dict同士を比べれば何とかなるかなと思い始めて頃に5分が経っていた。
+よく考えるとこの実装はアルファベット以外のstrはどうするんだという問題がある。
+sortして同一であるのがanagramだとは気づかなかったので、解答を見てなるほどと思った。
+```python
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        d = defaultdict(list)
+        for s in strs:
+            k = ''.join(sorted(s))
+            d[k].append(s)
+
+        return list(d.values())
+```
+## Step2
+```python
+```
+
+## Step3
+
+## 感想
+最初の方針でコードを実装して動かすと`TypeError: unhashable type: 'collections.defaultdict'`となった。<br>
+dictをkeyするのは流石に無茶かと思っていたが、やはり無茶だった。<br>
+hashableについて2つの記事、
+[記事１](https://qiita.com/yoichi22/items/ebf6ab3c6de26ddcc09a#__hash__-%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%E3%81%8C%E3%81%82%E3%82%8C%E3%81%B0-hashable)、
+[記事２](https://docs.python.org/ja/3/reference/datamodel.html#object.__hash__)、
+を読む。面白い。考えたこともなかった。
+```python
+class Solution:
+    def count_unicodes_in_word(self, word: str) -> dict:
+        # type check
+        if type(word) is not str:
+            raise TypeError(f'expected: str, actual: {type(word)}')
+
+        unicode_to_frequency = defaultdict(int)
+        for s in word:
+            unicode_to_frequency[ord(s)] += 1
+
+        return unicode_to_frequency
+
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+
+        unicode_frequency_maps = defaultdict(list)
+        for s in strs:
+            uc_to_freq = self.count_unicodes_in_word(s)
+            unicode_frequency_maps[uc_to_freq].append(s)
+            
+        return list(unicode_frequency_maps.values())
+```
