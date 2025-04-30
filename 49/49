@@ -1,0 +1,90 @@
+## Step1
+5分以内に書けなかった。
+各単語に対して、{a_i: n_i}, a_i = i番目のアルファベット、n_i = その単語がi番目のアルファベットを含む数というdictを作成して、dict同士を比べれば何とかなるかなと思い始めて頃に5分が経っていた。
+よく考えるとこの実装はアルファベット以外のstrはどうするんだという問題がある。
+sortして同一であるのがanagramだとは気づかなかったので、解答を見てなるほどと思った。
+```python
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        d = defaultdict(list)
+        for s in strs:
+            k = ''.join(sorted(s))
+            d[k].append(s)
+
+        return list(d.values())
+```
+## Step2
+レビュー依頼の直近５人についてレビューを読む。
+[https://github.com/shintaro1993/arai60/pull/16](https://github.com/shintaro1993/arai60/pull/16)<br>
+sortしないで済む場合分けを入れてる。<br><br>
+
+[https://github.com/plushn/SWE-Arai60/pull/12](https://github.com/plushn/SWE-Arai60/pull/12)<br>
+小文字以外は弾く。そういえば小文字大文字はどうsortされるんだったか？<br>
+問題の設定は全てlowercaseだけど、"Ab"と"ab"は同じとして扱うべきか？　それとも弾くべきか？<br><br>
+
+[https://github.com/fuga-98/arai60/pull/13](https://github.com/fuga-98/arai60/pull/13)<br>
+```python
+my_list = ['a', 'b', 'c']
+print(str(my_list))
+# 出力: "['a', 'b', 'c']"
+```
+strにlist入れるとそうなるのか。<br><br>
+
+[https://github.com/ichika0615/arai60/pull/11](https://github.com/ichika0615/arai60/pull/11)<br>
+単語をsortした後にordにして、'a'との差分からアルファベットを特定する。<br><br>
+
+[https://github.com/Mahiro-3612/leetcode/pull/2](https://github.com/Mahiro-3612/leetcode/pull/2)<br>
+時間計算量も求めること。<br><
+Cf. [https://discord.com/channels/1084280443945353267/1307605446538039337/1336992875577081917](https://discord.com/channels/1084280443945353267/1307605446538039337/1336992875577081917)<br>
+
+```python
+class Solution:
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+        if not isinstance(strs, list):
+            raise TypeError(f'Expected: list, Actual: {type(strs)}')
+
+        grouped_anagrams = defaultdict(list)
+        for s in strs:
+            basis_anagram = ''.join(sorted(s))
+            grouped_anagrams[basis_anagram].append(s)
+
+        return list(grouped_anagrams.values())
+```
+sortedの計算量はO(nlogn)らしい<br>
+[https://stackoverflow.com/questions/14434490/what-is-the-complexity-of-the-sorted-function](https://stackoverflow.com/questions/14434490/what-is-the-complexity-of-the-sorted-function)<br>
+すると
+計算量：O(mnlogn), m, n = strs.length, max(strs[i].length)
+時間計算量: 2*10^6 / 10^6 = 2 s
+
+## Step3
+10分に3回できた。
+
+## 感想
+最初の方針と前回を思い出しながらコードを実装して動かすと`TypeError: unhashable type: 'collections.defaultdict'`となった。<br>
+dictをkeyするのは流石に無茶かと思っていたが、やはり無茶だった。<br>
+hashableについて2つの記事、
+[hashableについてのqiita記事](https://qiita.com/yoichi22/items/ebf6ab3c6de26ddcc09a#__hash__-%E3%83%A1%E3%82%BD%E3%83%83%E3%83%89%E3%81%8C%E3%81%82%E3%82%8C%E3%81%B0-hashable)と
+[公式ドキュメントの__hash__の項目](https://docs.python.org/ja/3/reference/datamodel.html#object.__hash__)、
+を読む。面白い。考えたこともなかった。
+```python
+class Solution:
+    def count_unicodes_in_word(self, word: str) -> dict:
+        # type check
+        if type(word) is not str:
+            raise TypeError(f'expected: str, actual: {type(word)}')
+
+        unicode_to_frequency = defaultdict(int)
+        for s in word:
+            unicode_to_frequency[ord(s)] += 1
+
+        return unicode_to_frequency
+
+    def groupAnagrams(self, strs: List[str]) -> List[List[str]]:
+
+        unicode_frequency_maps = defaultdict(list)
+        for s in strs:
+            uc_to_freq = self.count_unicodes_in_word(s)
+            unicode_frequency_maps[uc_to_freq].append(s)
+            
+        return list(unicode_frequency_maps.values())
+```
